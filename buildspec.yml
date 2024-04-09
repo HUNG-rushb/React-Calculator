@@ -2,10 +2,10 @@ version: 0.2
 env:
   variables:
     ECR_REPO_NAME: react-calculator
+  # Only need for Docker Hub Login
   # secrets-manager:
   #   DOCKERHUB_TOKEN: dockerhub:token
   #   DOCKERHUB_USER: dockerhub:user
-  # Only need for Docker Hub Login
   # parameter-store:
   #   DOCKERHUB_TOKEN: /dockerhub/token
   #   DOCKERHUB_USER: /dockerhub/user
@@ -13,27 +13,40 @@ phases:
   pre_build:
     commands:
       # Docker Hub login
+      # - echo Logging in to Docker Hub....
       # - echo ${DOCKERHUB_TOKEN} | docker login -u ${DOCKERHUB_USER} --password-stdin
 
       # or using ECR Public Gallery login
+      - echo Logging in to Amazon ECR....
       - aws ecr-public get-login-password --region us-east-1 | docker login -u AWS --password-stdin public.ecr.aws
 
       # ECR login
       - ECR_MAIN_URI="${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com"
       - aws ecr get-login-password --region ${AWS_REGION} | docker login -u AWS --password-stdin ${ECR_MAIN_URI}
 
-      - ECR_IMAGE_URI="${ECR_MAIN_URI}/${ECR_REPO_NAME}:${CODEBUILD_RESOLVED_SOURCE_VERSION:0:8}-latest"
+      - REPOSITORY_URI="${ECR_MAIN_URI}/${ECR_REPO_NAME}"
+      # - COMMIT_HASH=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-7)
+      - COMMIT_HASH="${CODEBUILD_RESOLVED_SOURCE_VERSION:0:8}"
+      - IMAGE_TAG=${COMMIT_HASH:=latest}
   build:
     commands:
-      - docker build -t react-calculator:latest .
+      - echo Build started on `date`
+      - echo Building the Docker image...
+      # - docker build -t react-calculator:latest .
+      - docker build -t $REPOSITORY_URI:latest .
+      - docker tag $REPOSITORY_URI:latest $REPOSITORY_URI:$IMAGE_TAG
   post_build:
     commands:
-      - docker tag react-calculator:latest ${ECR_IMAGE_URI}
-      - docker push ${ECR_IMAGE_URI}
+      - echo Build completed on `date`
+      - echo Pushing the Docker image...
+      - docker push $REPOSITORY_URI:latest
+      - docker push $REPOSITORY_URI:$IMAGE_TAG
+
+      - echo Writing image definitions file...
       # Generate image definitions file for ECS
       # name for AWS ECS container
-      - printf '[{"name":"React_Calculator_Container","imageUri":"%s"}]' ${ECR_IMAGE_URI} > imagedefinitions.json
-
+      - printf '[{"name":"%s","imageUri":"%s"}]' "$ECR_REPO_NAME" "$REPOSITORY_URI:$IMAGE_TAG" > imagedefinitions.json
+      # - printf '[{"name":"React_Calculator_Container","imageUri":"%s"}]' ${ECR_IMAGE_URI} > imagedefinitions.json
 artifacts:
   files:
     - imagedefinitions.json
@@ -74,3 +87,31 @@ artifacts:
 # artifacts:
 #   files:
 #     - imageDetail.json
+
+# --------------------------------
+
+# phases:
+# pre_build:
+# commands:
+#   - echo Logging in to Amazon ECR...
+#   - aws ecr get-login-password --region $AWS_DEFAULT_REGION | docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com
+
+#   - REPOSITORY_URI=$AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE_REPO_NAME
+#   - COMMIT_HASH=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-7)
+#   - IMAGE_TAG=${COMMIT_HASH:=latest}
+# build:
+# commands:
+#   - echo Build started on `date`
+#   - echo Building the Docker image...
+
+#   - docker build -t $REPOSITORY_URI:latest .
+#   - docker tag $REPOSITORY_URI:latest $REPOSITORY_URI:$IMAGE_TAG
+# post_build:
+# commands:
+#   - echo Build completed on `date`
+#   - echo Pushing the Docker image...
+
+#   - docker push $REPOSITORY_URI:latest
+#   - docker push $REPOSITORY_URI:$IMAGE_TAG
+#   - echo Writing image definitions file...
+#   - printf '[{"name":"%s","imageUri":"%s"}]' "$IMAGE_REPO_NAME" "$REPOSITORY_URI:$IMAGE_TAG" > imagedefinitions.json

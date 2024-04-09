@@ -2,6 +2,7 @@ version: 0.2
 env:
   variables:
     ECR_REPO_NAME: react-calculator
+    ECS_CONTAINER_NAME: React_Calculator_Container
   # Only need for Docker Hub Login
   # secrets-manager:
   #   DOCKERHUB_TOKEN: dockerhub:token
@@ -45,7 +46,7 @@ phases:
       - echo Writing image definitions file...
       # Generate image definitions file for ECS
       # name for AWS ECS container
-      - printf '[{"name":"%s","imageUri":"%s"}]' "$ECR_REPO_NAME" "$REPOSITORY_URI:$IMAGE_TAG" > imagedefinitions.json
+      - printf '[{"name":"${ECS_CONTAINER_NAME}","imageUri":"%s"}]' "$ECR_REPO_NAME" "$REPOSITORY_URI:$IMAGE_TAG" > imagedefinitions.json
       # - printf '[{"name":"React_Calculator_Container","imageUri":"%s"}]' ${ECR_IMAGE_URI} > imagedefinitions.json
 artifacts:
   files:

@@ -31,7 +31,8 @@ phases:
       - docker tag react-calculator:latest ${ECR_IMAGE_URI}
       - docker push ${ECR_IMAGE_URI}
       # Generate image definitions file for ECS
-      - printf '[{"name":"react-calculator","imageUri":"%s"}]' ${ECR_IMAGE_URI} > imagedefinitions.json
+      # name for AWS ECS container
+      - printf '[{"name":"React_Calculator_Container","imageUri":"%s"}]' ${ECR_IMAGE_URI} > imagedefinitions.json
 
 artifacts:
   files:

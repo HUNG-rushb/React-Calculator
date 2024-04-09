@@ -134,6 +134,7 @@ function Calculator() {
     <>
       <div className="container">
         <div className="main">
+          <p>Calculator - WITH Pipeline</p>
           <Display input={input} setInput={setInput} answer={answer} />
           <Buttons
             inputHandler={inputHandler}

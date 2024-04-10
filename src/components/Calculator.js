@@ -134,7 +134,7 @@ function Calculator() {
     <>
       <div className="container">
         <div className="main">
-          <p>HUNG's React Calculator - with Blue/Green pipeline</p>
+          <p>HUNG's React Calculator - Final with Blue/Green pipeline</p>
           <Display input={input} setInput={setInput} answer={answer} />
           <Buttons
             inputHandler={inputHandler}

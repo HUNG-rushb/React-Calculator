@@ -49,17 +49,18 @@ artifacts:
   # files:
   #   - imagedefinitions.json
   files:
-    - "image*.json"
-    - "appspec.yaml"
-    - "taskdef.json"
-  secondary-artifacts:
-    DefinitionArtifact:
-      files:
-        - appspec.yaml
-        - taskdef.json
-    ImageArtifact:
-      files:
-        - imageDetail.json
+    # - image*.json
+    - imageDetail.json
+    - appspec.yaml
+    - taskdef.json
+  # secondary-artifacts:
+  #   DefinitionArtifact:
+  #     files:
+  #       - appspec.yaml
+  #       - taskdef.json
+  #   ImageArtifact:
+  #     files:
+  #       - imageDetail.json
 # -----------------------------
 # phases:
 #   install:

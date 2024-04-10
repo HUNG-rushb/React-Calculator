@@ -45,8 +45,20 @@ phases:
       - printf '[{"name":"%s","imageUri":"%s"}]' "$ECR_REPO_NAME" "$REPOSITORY_URI:$IMAGE_TAG" > imagedefinitions.json
       - echo Pipeline completed on `date`
 artifacts:
+  # files:
+  #   - imagedefinitions.json
   files:
-    - imagedefinitions.json
+    - "image*.json"
+    - "appspec.yaml"
+    - "taskdef.json"
+  secondary-artifacts:
+    DefinitionArtifact:
+      files:
+        - appspec.yaml
+        - taskdef.json
+    ImageArtifact:
+      files:
+        - imagedefinitions.json
 # -----------------------------
 # phases:
 #   install:

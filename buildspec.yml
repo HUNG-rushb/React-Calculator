@@ -2,30 +2,16 @@ version: 0.2
 env:
   variables:
     ECR_REPO_NAME: react-calculator
-    # ECS_CONTAINER_NAME: React_Calculator_Container
-  # Only need for Docker Hub Login
-  # secrets-manager:
-  #   DOCKERHUB_TOKEN: dockerhub:token
-  #   DOCKERHUB_USER: dockerhub:user
-  # parameter-store:
-  #   DOCKERHUB_TOKEN: /dockerhub/token
-  #   DOCKERHUB_USER: /dockerhub/user
 phases:
   pre_build:
     commands:
       - aws --version
-      # Docker Hub login
-      # - echo Logging in to Docker Hub....
-      # - echo ${DOCKERHUB_TOKEN} | docker login -u ${DOCKERHUB_USER} --password-stdin
-      # or using ECR Public Gallery login
       - echo Logging in to Amazon ECR Public Gallery....
       - aws ecr-public get-login-password --region us-east-1 | docker login -u AWS --password-stdin public.ecr.aws
       # ECR login
       - ECR_MAIN_URI="${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com"
       - aws ecr get-login-password --region ${AWS_REGION} | docker login -u AWS --password-stdin ${ECR_MAIN_URI}
-
       - REPOSITORY_URI="${ECR_MAIN_URI}/${ECR_REPO_NAME}"
-      # - COMMIT_HASH=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-7)
       - COMMIT_HASH="${CODEBUILD_RESOLVED_SOURCE_VERSION:0:8}"
       - IMAGE_TAG=${COMMIT_HASH:=latest}
   build:
@@ -41,28 +27,8 @@ phases:
       - docker push $REPOSITORY_URI:latest
       - docker push $REPOSITORY_URI:$IMAGE_TAG
       - echo Writing image definitions file...
-      # Generate image definitions file for ECS
-      - printf '[{"name":"%s","imageUri":"%s"}]' "$ECR_REPO_NAME" "$REPOSITORY_URI:$IMAGE_TAG" > imagedefinitions.json
+      - printf '{"ImageURI":"%s"}' "$REPOSITORY_URI:$IMAGE_TAG" > imageDetail.json
       - echo Pipeline completed on `date`
 artifacts:
   files:
     - imagedefinitions.json
-# -----------------------------
-# phases:
-#   install:
-#     runtime-versions:
-#         docker: 18
-#     commands:
-#       - nohup /usr/local/bin/dockerd --host=unix:///var/run/docker.sock --host=tcp://127.0.0.1:2375 --storage-driver=overlay2&
-#       - timeout 15 sh -c "until docker info; do echo .; sleep 1; done"
-#   post_build:
-#     commands:
-#     - echo Build completed on `date`
-#     - echo pushing to repo
-#     # update the following line with the URI of your own ECR repository
-#     - docker push $REPOSITORY_URI:latest
-#     - docker push $REPOSITORY_URI:$IMAGE_TAG
-#     - echo Writing image definitions file...
-#     #- printf '[{"ImageURI":"%s"}]' $REPOSITORY_URI:$IMAGE_TAG > imageDetail.json
-#     - printf '{"ImageURI":"%s"}' $REPOSITORY_URI:$IMAGE_TAG > imageDetail.json
-

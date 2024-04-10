@@ -79,6 +79,5 @@
     "operatingSystemFamily": "LINUX"
   },
   "registeredAt": "2024-04-10T09:50:07.120Z",
-  "registeredBy": "arn:aws:sts::928738046450:assumed-role/AWSCodePipelineServiceRole-us-east-1-React_Calculator_Pipeline/1712742606767",
-  "tags": []
+  "registeredBy": "arn:aws:sts::928738046450:assumed-role/AWSCodePipelineServiceRole-us-east-1-React_Calculator_Pipeline/1712742606767"
 }

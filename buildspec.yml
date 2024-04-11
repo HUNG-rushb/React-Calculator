@@ -1,7 +1,7 @@
 version: 0.2
 env:
   variables:
-    ECR_REPO_NAME: FCJ_Repo # Replace this with your ECR Repo name
+    ECR_REPO_NAME: fcj-image-repo # Replace this with your ECR Repo name
 phases:
   pre_build:
     commands:

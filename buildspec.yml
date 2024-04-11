@@ -1,7 +1,7 @@
 version: 0.2
 env:
   variables:
-    ECR_REPO_NAME: react-calculator
+    ECR_REPO_NAME: FCJ_Repo # Replace this with your ECR Repo name
 phases:
   pre_build:
     commands:
@@ -11,6 +11,7 @@ phases:
       # ECR login
       - ECR_MAIN_URI="${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com"
       - aws ecr get-login-password --region ${AWS_REGION} | docker login -u AWS --password-stdin ${ECR_MAIN_URI}
+
       - REPOSITORY_URI="${ECR_MAIN_URI}/${ECR_REPO_NAME}"
       - COMMIT_HASH="${CODEBUILD_RESOLVED_SOURCE_VERSION:0:8}"
       - IMAGE_TAG=${COMMIT_HASH:=latest}
@@ -31,4 +32,14 @@ phases:
       - echo Pipeline completed on `date`
 artifacts:
   files:
-    - imagedefinitions.json
+    - "image*.json"
+    - "appspec.yaml"
+    - "taskdef.json"
+  secondary-artifacts:
+    DefinitionArtifact:
+      files:
+        - appspec.yaml
+        - taskdef.json
+    ImageArtifact:
+      files:
+        - imageDetail.json

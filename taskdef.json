@@ -1,5 +1,5 @@
 {
-  "taskDefinitionArn": "arn:aws:ecs:us-east-1:928738046450:task-definition/ReactCalculator_TaskDef_3:7",
+  "taskDefinitionArn": "arn:aws:ecs:<region>:<account_ID>:task-definition/ReactCalculator_TaskDef_3:7",
   "containerDefinitions": [
     {
       "name": "react-calculator",
@@ -34,8 +34,7 @@
     }
   ],
   "family": "ReactCalculator_TaskDef_3",
-  "taskRoleArn": "arn:aws:iam::928738046450:role/ecsTaskExecutionRole",
-  "executionRoleArn": "arn:aws:iam::928738046450:role/ecsTaskExecutionRole",
+
   "networkMode": "awsvpc",
   "revision": 7,
   "volumes": [],
@@ -78,6 +77,5 @@
     "cpuArchitecture": "X86_64",
     "operatingSystemFamily": "LINUX"
   },
-  "registeredAt": "2024-04-10T09:50:07.120Z",
-  "registeredBy": "arn:aws:sts::928738046450:assumed-role/AWSCodePipelineServiceRole-us-east-1-React_Calculator_Pipeline/1712742606767"
+  "registeredAt": "2024-04-10T09:50:07.120Z"
 }
